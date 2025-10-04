@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:GMA_List.Resources.ViewModels"
+             xmlns:models="clr-namespace:GMA_List.Resources.Models"
+             x:Class="GMA_List.MainPage"
+             x:DataType="viewmodels:ListadoViewModel">
+    
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <viewmodels:BoolToVistoConverter x:Key="BoolToVistoConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Buscador y Filtros -->
+        <StackLayout Grid.Row="0" Padding="15">
+            <SearchBar Placeholder="Buscar por nombre..."
+                       Text="{Binding FiltroNombre}"
+                       SearchCommand="{Binding CargarCommand}"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Todos" Command="{Binding FiltrarTodosCommand}"/>
+                <Button Text="Vistos" Command="{Binding FiltrarVistosCommand}"/>
+                <Button Text="No vistos" Command="{Binding FiltrarNoVistosCommand}"/>
+            </HorizontalStackLayout>
+        </StackLayout>
+
+        <!-- Lista de Contenidos -->
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding Contenidos}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ContenidoCompleto">
+                    <Frame Margin="10" Padding="10" CornerRadius="10">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:ListadoViewModel}}, Path=VerDetalleCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto">
+
+                            <Image Grid.Column="0" Grid.RowSpan="3"
+                                   Source="{Binding Contenido.ImagenUrl}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="120"
+                                   WidthRequest="90"/>
+
+                            <Label Grid.Column="1" Grid.Row="0"
+                                   Text="{Binding Contenido.Nombre}"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   Margin="10,0"/>
+
+                            <Label Grid.Column="1" Grid.Row="1"
+                                   Text="{Binding Contenido.Temporadas, StringFormat='Temporadas: {0}'}"
+                                   FontSize="12"
+                                   Margin="10,0"/>
+
+                            <HorizontalStackLayout Grid.Column="1" Grid.Row="2" Margin="10,5">
+                                <Label Text="Yo: "/>
+                                <Label Text="{Binding VistoYo, Converter={StaticResource BoolToVistoConverter}}"/>
+                                <Label Text=" | Marcela: " Margin="10,0,0,0"/>
+                                <Label Text="{Binding VistoMarcela, Converter={StaticResource BoolToVistoConverter}}"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Botón Flotante Agregar -->
+        <Button Grid.Row="2"
+                Text="+ Agregar"
+                Command="{Binding AgregarCommand}"
+                Margin="20"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                CornerRadius="30"
+                WidthRequest="120"
+                HeightRequest="60"/>
+    </Grid>
+</ContentPage>
